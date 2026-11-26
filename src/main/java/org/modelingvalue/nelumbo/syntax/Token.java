@@ -116,14 +116,23 @@ public final class Token implements AstElement {
         return t1;
     }
 
+    // A split-off or merged piece need not be a valid token on its own (combining
+    // marks, for instance, are only valid inside a larger token). TokenType.of
+    // returns null there; ERROR turns that into a normal parse error instead of
+    // a NullPointerException.
+    private static TokenType typeOrNotMatched(String text) {
+        TokenType type = TokenType.of(text);
+        return type != null ? type : TokenType.ERROR;
+    }
+
     private Token splitGet1(int len) {
         String sub = text.substring(0, len);
-        return new Token(TokenType.of(sub), sub, line, position, index, fileName);
+        return new Token(typeOrNotMatched(sub), sub, line, position, index, fileName);
     }
 
     private Token splitGet2(int len) {
         String sub = text.substring(len);
-        return new Token(TokenType.of(sub), sub, line, position + len, index + len, fileName);
+        return new Token(typeOrNotMatched(sub), sub, line, position + len, index + len, fileName);
     }
 
     public void connect(Token t1) {
@@ -138,7 +147,7 @@ public final class Token implements AstElement {
 
     public Token prepend(String prefix) {
         String sup = prefix + text;
-        Token merge = new Token(TokenType.of(sup), sup, line, position - prefix.length(), index - prefix.length(),
+        Token merge = new Token(typeOrNotMatched(sup), sup, line, position - prefix.length(), index - prefix.length(),
                 fileName);
         merge.next = next;
         merge.nextAll = nextAll;
