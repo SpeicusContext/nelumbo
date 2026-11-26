@@ -147,7 +147,7 @@ public class U {
                     Path parent = filePath.getParent();
                     int okCount = 0;
                     for (int i = 1; i < reversedSplit.size(); i++) {
-                        if (parent != null && parent.getFileName().toString().equals(reversedSplit.get(i))) {
+                        if (hasFileName(parent, reversedSplit.get(i))) {
                             parent = parent.getParent();
                             okCount++;
                         }
@@ -165,6 +165,12 @@ public class U {
                 results.add(filePath);
             }
         }
+    }
+
+    // A root can be the parent in this walk, but has no filename itself.
+    static boolean hasFileName(Path path, String expected) {
+        Path fileName = path == null ? null : path.getFileName();
+        return fileName != null && fileName.toString().equals(expected);
     }
 
     public static boolean isProject(Path path) {
