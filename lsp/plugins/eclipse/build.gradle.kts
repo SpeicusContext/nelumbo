@@ -21,10 +21,20 @@ java {
     }
 }
 
-// All compile dependencies come from libs/ (copied from the target Eclipse installation).
+// All Eclipse dependencies come from libs/ (copied from the target Eclipse installation).
 // This ensures compile-time and runtime API versions match, and avoids platform-specific Maven artifacts.
+val eclipseLibs = fileTree(mapOf("dir" to "libs", "include" to listOf("*.jar")))
+
 dependencies {
-    compileOnly(fileTree(mapOf("dir" to "libs", "include" to listOf("*.jar"))))
+    compileOnly(eclipseLibs)
+    testImplementation(eclipseLibs)
+    testImplementation(libs.junit.jupiter)
+    testRuntimeOnly("org.junit.platform:junit-platform-launcher")
+}
+
+tasks.test {
+    useJUnitPlatform()
+    jvmArgs("-ea")
 }
 
 val serverProject = project(":lsp:server")

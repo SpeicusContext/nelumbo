@@ -35,6 +35,7 @@ import org.eclipse.jface.text.presentation.IPresentationRepairer;
 import org.eclipse.lsp4e.LSPEclipseUtils;
 import org.eclipse.lsp4e.LanguageServerWrapper;
 import org.eclipse.lsp4e.LanguageServers;
+import org.eclipse.lsp4j.ServerCapabilities;
 import org.eclipse.lsp4j.SemanticTokens;
 import org.eclipse.lsp4j.SemanticTokensLegend;
 import org.eclipse.lsp4j.SemanticTokensParams;
@@ -136,7 +137,7 @@ public class NelumboSemanticDamagerRepairer implements IPresentationDamager, IPr
             try {
                 long stamp = modificationStamp(doc);
                 LanguageServers.forDocument(doc).withFilter(capabilities -> capabilities.getSemanticTokensProvider() != null).computeFirst((wrapper, server) -> {
-                    SemanticTokensWithRegistrationOptions provider = wrapper.getServerCapabilities().getSemanticTokensProvider();
+                    SemanticTokensWithRegistrationOptions provider = semanticTokensProvider(wrapper.getServerCapabilities());
                     if (provider == null) {
                         return CompletableFuture.completedFuture(null);
                     }
@@ -156,6 +157,11 @@ public class NelumboSemanticDamagerRepairer implements IPresentationDamager, IPr
                 t.printStackTrace(System.err);
             }
         }, delayMs, TimeUnit.MILLISECONDS);
+    }
+
+    // LSP4E can clear capabilities during a restart, which means the server is not ready yet.
+    static SemanticTokensWithRegistrationOptions semanticTokensProvider(ServerCapabilities capabilities) {
+        return capabilities == null ? null : capabilities.getSemanticTokensProvider();
     }
 
     private void retry(IDocument doc, long stamp, int attempt) {
