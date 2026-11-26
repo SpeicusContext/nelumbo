@@ -53,6 +53,21 @@ public class RegressionTest extends NelumboTestBase {
     }
 
     @RepeatedTest(10)
+    public void multilineStringSpanningLines() {
+        testResource("multiline-string-spanning-lines.nl");
+    }
+
+    // The correct outcome is parse diagnostics, not an uncaught exception.
+    @RepeatedTest(10)
+    public void multilineStringAssert() throws IOException {
+        String name = "multiline-string-assert.nl";
+        String source = new String(
+                RegressionTest.class.getResourceAsStream(NelumboConstants.NELUMBO_TESTS + name).readAllBytes());
+        EvalResult result = evaluate(source, name, 60_000);
+        assertTrue(!result.diagnostics().isEmpty(), "diagnostics: " + result.diagnostics());
+    }
+
+    @RepeatedTest(10)
     public void literalConstructorInRuleHead() {
         testResource("literal-constructor-in-rule-head.nl");
     }

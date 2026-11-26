@@ -147,8 +147,10 @@ public class Tokenizer {
             assert (token.fileName().equals(fileName));
             assert (input.substring(token.index(), token.indexEnd()).equals(token.text()));
             if (token.type() != TokenType.IN_LINE_COMMENT) {
-                assert (lines[token.line()].substring(token.position(), token.position() + token.text().length())
-                        .equals(token.text()));
+                // A token may span multiple lines (a multi-line string or block comment):
+                // check its text across the joined lines, not within its first line only.
+                assert (String.join("", java.util.Arrays.asList(lines).subList(token.line(), token.lastLine() + 1))
+                        .substring(token.position(), token.position() + token.text().length()).equals(token.text()));
             }
         }
 
