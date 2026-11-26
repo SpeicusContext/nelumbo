@@ -572,6 +572,9 @@ public class Node extends StructImpl implements AstElement {
                     if (thisIn instanceof Variable var) {
                         thisVal = declVar.setType(var.type());
                         replace.put(var, (Variable) thisVal);
+                        // Renaming a variable must also update bindings made earlier in this match.
+                        vars = vars.replaceAll(e -> Entry.of(e.getKey(),
+                                e.getValue() instanceof Node n ? n.setBinding(n, (Map) replace.get()) : e.getValue()));
                     } else {
                         thisVal = declVar;
                     }
