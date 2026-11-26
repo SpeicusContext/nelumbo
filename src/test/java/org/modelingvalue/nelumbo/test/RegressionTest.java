@@ -53,6 +53,11 @@ public class RegressionTest extends NelumboTestBase {
     }
 
     @RepeatedTest(10)
+    public void thenElseSharedVariable() {
+        testResource("then-else-shared-variable-npe.nl");
+    }
+
+    @RepeatedTest(10)
     public void literalConstructorInRuleHead() {
         testResource("literal-constructor-in-rule-head.nl");
     }
